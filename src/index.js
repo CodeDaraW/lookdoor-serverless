@@ -16,44 +16,40 @@ const encrypt = (key, msg) => {
 };
 
 const openDoor = async (equipment_id = EQUIPMENT_ID) => {
-  try {
-    const keyRes = await axios.post(
-      "https://api.lookdoor.cn:443/func/hjapp/user/v2/getPasswordAesKey.json?"
-    );
-    const cookie = keyRes.headers["set-cookie"];
-    const aesKey = keyRes.data.data.aesKey;
+  const keyRes = await axios.post(
+    "https://api.lookdoor.cn:443/func/hjapp/user/v2/getPasswordAesKey.json?"
+  );
+  const cookie = keyRes.headers["set-cookie"];
+  const aesKey = keyRes.data.data.aesKey;
 
-    console.log("keyRes.data", keyRes.data);
-    console.log("cookie", cookie);
-    console.log("aesKey", aesKey);
+  console.log("keyRes.data", keyRes.data);
+  console.log("cookie", cookie);
+  console.log("aesKey", aesKey);
 
-    const encyptedPassword = encrypt(aesKey, PASSWORD_MD5);
+  const encyptedPassword = encrypt(aesKey, PASSWORD_MD5);
 
-    const loginRes = await axios.post(
-      `https://api.lookdoor.cn:443/func/hjapp/user/v2/login.json?password=${encyptedPassword}&deviceId=${DEVICE_ID}&loginNumber=${PHONE}&equipmentFlag=1`,
-      null,
-      {
-        headers: {
-          cookie,
-        },
-      }
-    );
-    console.log("loginRes.data", loginRes.data);
+  const loginRes = await axios.post(
+    `https://api.lookdoor.cn:443/func/hjapp/user/v2/login.json?password=${encyptedPassword}&deviceId=${DEVICE_ID}&loginNumber=${PHONE}&equipmentFlag=1`,
+    null,
+    {
+      headers: {
+        cookie,
+      },
+    }
+  );
+  console.log("loginRes.data", loginRes.data);
 
-    const openRes = await axios.post(
-      `https://api.lookdoor.cn:443/func/hjapp/house/v1/pushOpenDoorBySn.json?equipmentId=${equipment_id}`,
-      null,
-      {
-        headers: {
-          cookie,
-        },
-      }
-    );
-    console.log("openRes.data", openRes.data);
-    return openRes.data;
-  } catch (err) {
-    console.log(err);
-  }
+  const openRes = await axios.post(
+    `https://api.lookdoor.cn:443/func/hjapp/house/v1/pushOpenDoorBySn.json?equipmentId=${equipment_id}`,
+    null,
+    {
+      headers: {
+        cookie,
+      },
+    }
+  );
+  console.log("openRes.data", openRes.data);
+  return openRes.data;
 };
 
 module.exports.openDoor = openDoor;
